@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { getAuth, signInWithRedirect, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
 
 const firebaseConfig = {
@@ -8,7 +8,7 @@ const firebaseConfig = {
     projectId: "crwn-clothing-db-763e4",
     storageBucket: "crwn-clothing-db-763e4.appspot.com",
     messagingSenderId: "965431597322",
-    appId: "1:965431597322:web:0a6a3e588e8568d42a82f3"
+    appId: "1:965431597322:web:0a6a3e588e8568d42a82f3",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
@@ -59,4 +59,8 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) =>  {
     if(!email || !password) return
 
     return await signInWithEmailAndPassword(auth, email, password)
+}
+
+export const signOutUser = async () => {
+    await signOut(auth)
 }
