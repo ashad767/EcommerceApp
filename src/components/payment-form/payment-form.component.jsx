@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { CardElement, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 import Button from '../button/button.component'
 import BUTTON_TYPE_CLASSES from '../button/button.component'
@@ -21,6 +21,8 @@ const PaymentForm = ({ amount }) => {
     const paymentHandler = async (e) => {
         e.preventDefault();
 
+        await elements.submit()
+
         if (!stripe || !elements) {
             return;
         }
@@ -35,25 +37,32 @@ const PaymentForm = ({ amount }) => {
 
         const { paymentIntent: { client_secret }} = response;
         
-        const paymentResult = await stripe.confirmCardPayment(client_secret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    name: currentUser ? currentUser.displayName : 'Guest'
-                }
-            }
+        // const paymentResult = await stripe.confirmCardPayment(client_secret, {
+        //     payment_method: {
+        //         card: elements.getElement(CardElement),
+        //         billing_details: {
+        //             name: currentUser ? currentUser.displayName : 'Guest'
+        //         }
+        //     }
+        // });
+
+        const paymentResult2 = await stripe.confirmPayment({
+            elements,
+            clientSecret: client_secret,
+            confirmParams: {
+                return_url: 'http://localhost:3000/checkout'
+            },
         });
 
         setIsProcessingPayment(false);
 
-        if (paymentResult.error) {
+        if (paymentResult2.error) {
             alert("Payment failed, please try again!");
         }
         else {
-            if (paymentResult.paymentIntent.status === 'succeeded') {
+            if (paymentResult2.paymentIntent.status === 'succeeded') {
                 alert('Payment Successful!');
             }
-
             clearCart();
         }
     }
@@ -63,7 +72,7 @@ const PaymentForm = ({ amount }) => {
         <FormContainer onSubmit={paymentHandler}>
             <h2>Credit Card Payment</h2>
             <br></br>
-            <CardElement />
+            <PaymentElement />
             <br></br>
             <Button disabled={amount == 0} isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>
                 Pay Now

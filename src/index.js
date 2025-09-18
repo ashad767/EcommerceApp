@@ -11,6 +11,12 @@ import { stripePromise } from './utils/stripe/stripe.utils';
 
 import './index.scss';
 
+const options = {
+  mode: 'payment',
+  currency: 'usd',
+  amount: 1099,
+};
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
@@ -18,9 +24,9 @@ root.render(
       <UserProvider>
         <CategoriesProvider>
           <CartProvider>
-            <Elements stripe={stripePromise}>
+            {/* <Elements stripe={stripePromise} options={options}> */}
               <App />
-            </Elements>
+            {/* </Elements> */}
           </CartProvider>
         </CategoriesProvider>
       </UserProvider>
