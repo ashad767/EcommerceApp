@@ -34,33 +34,30 @@ const PaymentForm = ({ amount }) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ amount })
         }).then(res => res.json());
-
+    
         const { paymentIntent: { client_secret }} = response;
         
-        // const paymentResult = await stripe.confirmCardPayment(client_secret, {
-        //     payment_method: {
-        //         card: elements.getElement(CardElement),
-        //         billing_details: {
-        //             name: currentUser ? currentUser.displayName : 'Guest'
-        //         }
-        //     }
-        // });
-
-        const paymentResult2 = await stripe.confirmPayment({
+        const paymentResult = await stripe.confirmPayment({
             elements,
             clientSecret: client_secret,
             confirmParams: {
-                return_url: 'http://localhost:3000/checkout'
+                return_url: `${window.location.protocol}//${window.location.host}/checkout`,
+                payment_method_data: {
+                    billing_details: {
+                        name: currentUser ? currentUser.displayName : 'Guest'
+                    }
+                }
             },
+            redirect: 'if_required'
         });
 
         setIsProcessingPayment(false);
-
-        if (paymentResult2.error) {
+        console.log(paymentResult)
+        if (paymentResult.error) {
             alert("Payment failed, please try again!");
         }
         else {
-            if (paymentResult2.paymentIntent.status === 'succeeded') {
+            if (paymentResult.paymentIntent.status === 'succeeded') {
                 alert('Payment Successful!');
             }
             clearCart();
@@ -74,7 +71,7 @@ const PaymentForm = ({ amount }) => {
             <br></br>
             <PaymentElement />
             <br></br>
-            <Button disabled={amount == 0} isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>
+            <Button isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>
                 Pay Now
             </Button>
         </FormContainer>
